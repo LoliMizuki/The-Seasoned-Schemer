@@ -182,3 +182,48 @@
 (two-in-a-rows? '())
 (two-in-a-rows? '(z x a a b d f))
 (two-in-a-rows? '(z x a b a d f))
+
+; 改寫 sum-of-prefixes
+
+(define sum-of-prefixes
+  (lambda (tup)
+    (letrec 
+        ((S (lambda (sonssf tup)
+              (cond
+                ((null? tup) '())
+                (else 
+                 (cons 
+                  (+ sonssf (car tup)) 
+                  (S (+ sonssf (car tup)) (cdr tup))))))))
+      (S 0 tup))))
+
+(sum-of-prefixes '(2 3 4 6 9 1))
+
+; 改寫 scramble
+
+(define scramble
+  (lambda (tup)
+    (letrec
+        ((one?
+          (lambda (n) (= 1 n)))
+         (pick
+          (lambda (n lat)
+            (cond 
+              ((one? n) (car lat))
+              (else (pick (sub1 n) (cdr lat))))))
+         (scramble-b 
+          (lambda (tup rev-pre)
+            (cond
+              ((null? tup) '())
+              (else 
+               (cons 
+                (pick (car tup) (cons (car tup) rev-pre))
+                (scramble-b (cdr tup) (cons (car tup) rev-pre))))))))
+      (scramble-b tup '()))))
+
+;;; should be '(1 1 1 1 1 1 1 1 1)
+(scramble '(1 2 3 4 5 6 7 8 9))
+
+;;; should be '(1 1 1 1 1 1 1 1 2 8 2)
+(scramble '(1 2 3 1 2 3 4 1 8 2 10))
+
