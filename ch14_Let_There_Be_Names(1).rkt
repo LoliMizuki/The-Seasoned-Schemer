@@ -86,7 +86,53 @@
                      ((av (R (car l))))
                    (cond
                      ((eqlist? (car l) av) (cons (car l) (R (cdr l))))
-                     (else (cons av (cdr l)))))))))
+                     (else (cons av (cdr l))))))))))
       (R l))))
 
 (rember1* 'a '(('() a b) a (a b c)))
+
+  
+  
+(define depth*
+  (lambda (l)
+    (cond
+      ((null? l) 1)
+      ((atom? (car l)) (depth* (cdr l)))
+      (else (max (add1 (depth* (car l))) (depth* (cdr l)))))))
+           
+(depth* '(1(2(3(4(5))))))
+(depth* '((1 2 3 (6 7))))
+(depth* '())
+(depth* '(c (b (a b) a) a))
+
+
+; 用 let 改寫 scramble
+
+(define pick
+  (lambda (n lat)
+    (letrec
+     ((one?
+       (lambda (n) (= 1 n))))
+     (cond 
+       ((one? n) (car lat))
+       (else (pick (sub1 n) (cdr lat)))))))
+
+(define scramble
+  (lambda (tup)
+    (letrec
+        ((P (lambda (tup rp)
+             (cond
+              ((null? tup) '())
+              (else
+               (let ((rp (cons (car tup) rp)))
+                 (cons 
+                  (pick (car tup) rp)
+                  (P (cdr tup) rp))))))))
+      (P tup '()))))  
+               
+;;; should be '(1 1 1 1 1 1 1 1 1)
+(scramble '(1 2 3 4 5 6 7 8 9))
+
+;;; should be '(1 1 1 1 1 1 1 1 2 8 2)
+(scramble '(1 2 3 1 2 3 4 1 8 2 10))
+
